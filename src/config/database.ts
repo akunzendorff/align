@@ -11,12 +11,8 @@ import { Task } from "../models/Task";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: process.env.SUPABASE_DB_HOST,
-    port: Number(process.env.SUPABASE_DB_PORT) || 5432,
-    username: process.env.SUPABASE_DB_USER,
-    password: process.env.SUPABASE_DB_PASSWORD,
-    database: process.env.SUPABASE_DB_DATABASE,
-    ssl: true, // Necessário para conexão com Supabase
+    url: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === "production" || process.env.DATABASE_URL?.includes('supabase'), // Habilita SSL para produção ou Supabase
     extra: {
         ssl: {
             rejectUnauthorized: false // Necessário para conexão SSL com Supabase

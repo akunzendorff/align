@@ -68,8 +68,8 @@ src/
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/Richard-Strn/align-backend.git
-cd align-backend
+git clone https://github.com/akunzendorff/align.git
+cd align
 ```
 
 2. Instale as dependências de produção:
