@@ -1,10 +1,14 @@
-# Align Backend
+# Align
 
-Backend do Align, uma plataforma de gestão financeira e colaboração para casais. Desenvolvido com TypeScript, Express, TypeORM e PostgreSQL.
+O Align é uma plataforma de gestão financeira e colaboração para casais. Este repositório contém o `back-end` (API RESTful) e o `front-end` (aplicação web em React).
 
 ## 🚀 Funcionalidades
 
-- 🔐 **Autenticação e Autorização**
+### Back-end
+
+O back-end é responsável pela lógica de negócio, segurança dos dados e integrações.
+
+- 🔐 **Autenticação e Segurança**
   - Autenticação baseada em JWT
   - Autorização baseada em tenant
   - Conformidade com LGPD e gestão de consentimento
@@ -27,18 +31,29 @@ Backend do Align, uma plataforma de gestão financeira e colaboração para casa
   - Lembretes de tarefas
   - Atualizações de progresso das metas
 
-## 🛠 Stack Tecnológica
+### Front-end
 
-- **Linguagem:** TypeScript
-- **Runtime:** Node.js
-- **Framework:** Express.js
+A interface do usuário é uma Single Page Application (SPA) moderna e responsiva.
+
+- **Interface Intuitiva:** Foco em usabilidade para facilitar a gestão financeira conjunta.
+- **Visualização de Dados:** Dashboards e gráficos para acompanhamento de metas e despesas.
+- **Componentização:** Interface construída com componentes reutilizáveis.
+
+## 🛠️ Stack Tecnológica
+
+### Back-end
+- **Linguagem e Runtime:** TypeScript, Node.js
+- **Framework e ORM:** Express.js, TypeORM
 - **Banco de Dados:** PostgreSQL
-- **ORM:** TypeORM
-- **Sistema de Filas:** BullMQ + Redis
-- **Autenticação:** JWT
-- **Notificações Push:** Firebase Admin SDK
-- **Email:** Nodemailer
-- **Testes:** Jest
+- **Filas e Cache:** BullMQ, Redis
+- **Testes:** Jest, Supertest
+
+### Front-end
+- **Framework:** React
+- **Linguagem:** TypeScript
+- **Gerenciamento de Estado:** Zustand
+- **Roteamento:** React Router
+- **Estilização:** Tailwind CSS
 
 ## 🏗 Estrutura do Projeto
 
@@ -157,10 +172,7 @@ npm start
 
 ### Finanças
 
-- `GET /api/finance/transactions` - Listar transações
-- `GET /api/finance/goals` - Listar metas financeiras
-- `POST /api/finance/goals` - Criar meta financeira
-- `GET /api/finance/categories` - Listar categorias
+- `PATCH /api/finance/goals/:id` - Adicionar progresso a uma meta
 
 ### Colaboração
 
@@ -172,164 +184,7 @@ npm start
 ### Conformidade LGPD
 
 - `POST /api/consent` - Registrar consentimento do usuário
-- `POST /api/consent/:type/revoke` - Revogar consentimento específico
-- `DELETE /api/user/data` - Excluir dados do usuário (Direito ao Esquecimento)
 
-## 🧪 Testes e Seeds
-
-### Configuração do Ambiente de Teste
-
-1. Crie um banco de dados para testes:
-```sql
-CREATE DATABASE align_test;
-```
-
-2. Configure as variáveis de ambiente de teste no arquivo `.env.test`:
-```env
-TEST_DB_HOST=localhost
-TEST_DB_PORT=5432
-TEST_DB_USER=seu_usuario
-TEST_DB_PASS=sua_senha
-TEST_DB_NAME=align_test
-```
-
-### Executando os Testes
-
-1. Executar todos os testes:
-```bash
-npm test
-```
-
-2. Executar testes em modo watch (desenvolvimento):
-```bash
-npm run test:watch
-```
-
-3. Executar testes com cobertura:
-```bash
-npm run test:coverage
-```
-
-### Grupos de Testes
-
-O projeto inclui testes para:
-- Autenticação e Autorização
-- Rotas Financeiras
-- Rotas de Colaboração
-- Middleware de Tenant
-- Serviços de Notificação
-
-### Seeds de Desenvolvimento
-
-1. Popular o banco com dados iniciais:
-```bash
-npm run seed
-```
-
-Os dados de seed incluem:
-- Usuários de exemplo
-- Casal com configurações básicas
-- Categorias financeiras padrão
-- Metas e tarefas de exemplo
-- Transações de exemplo
-
-2. Para limpar os dados (em desenvolvimento):
-```bash
-npm run typeorm schema:drop
-npm run migration:run
-npm run seed
-```
-
-### Estrutura dos Testes
-
-```
-test/
-├── setup.ts              # Configuração global dos testes
-├── auth.test.ts         # Testes de autenticação
-├── finance.test.ts      # Testes financeiros
-└── collab.test.ts       # Testes de colaboração
-```
-
-### Cobertura de Testes
-
-O relatório de cobertura inclui:
-- Statements (declarações)
-- Branches (condicionais)
-- Functions (funções)
-- Lines (linhas)
-
-Para visualizar o relatório detalhado:
-1. Execute `npm run test:coverage`
-2. Abra `coverage/lcov-report/index.html` no navegador
-
-## 🔄 Migrações do Banco de Dados
-
-Gerar uma nova migração:
-```bash
-npm run migration:generate -- -n NomeDaMigracao
-```
-
-Executar migrações pendentes:
-```bash
-npm run migration:run
-```
-
-Reverter última migração:
-```bash
-npm run migration:revert
-```
-
-## 📄 Licença
+##  Licença
 
 Este projeto está licenciado sob a Licença ISC.
-
-## 👥 Contribuindo
-
-1. Faça um fork do repositório
-2. Crie sua branch de feature (`git checkout -b feature/recurso-incrivel`)
-3. Faça commit das suas alterações (`git commit -m 'Adiciona recurso incrível'`)
-4. Faça push para a branch (`git push origin feature/recurso-incrivel`)
-5. Abra um Pull Request
-
-## ⚠️ Observações de Segurança
-
-- Todas as senhas são hasheadas antes do armazenamento
-- Dados sensíveis são criptografados em repouso
-- Tokens de API e credenciais são armazenados de forma segura
-- Implementação completa de tenant isolation
-- Conformidade com LGPD para dados pessoais
-
-## 📊 Monitoramento
-
-O sistema inclui logs detalhados para:
-- Tentativas de autenticação
-- Sincronização de dados financeiros
-- Execução de jobs em background
-- Envio de notificações
-- Operações de consentimento LGPD
-
-## 🔍 Solução de Problemas
-
-### Logs
-
-Os logs estão disponíveis em:
-- Console (desenvolvimento)
-- Arquivos de log (produção)
-- Monitoramento de jobs do BullMQ
-
-### Comandos Úteis
-
-Verificar status dos workers:
-```bash
-npm run queue:status
-```
-
-Limpar filas:
-```bash
-npm run queue:clean
-```
-
-Verificar logs:
-```bash
-npm run logs
-```
