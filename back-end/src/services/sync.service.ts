@@ -1,5 +1,6 @@
 import { getRepository } from 'typeorm';
 import { BankConnection } from '../models/BankConnection';
+import { BankAccount } from '../models/BankAccount'; // Supondo que este modelo exista
 import { Transaction } from '../models/Transaction';
 import { ConnectorService } from './connector.service';
 import { NormalizationService } from './normalization.service';
@@ -33,19 +34,19 @@ export class SyncService {
 
             for (const n of normalized) {
                 if (n.externalId) {
-                    const exists = await txRepo.findOne({ where: { externalId: n.externalId } as any });
+                    const exists = await txRepo.findOne({ where: { externalId: n.externalId } });
                     if (exists) continue;
                 }
 
                 // tentar mapear conta pelo externalAccountId
-                let bankAccountRef: any = undefined;
+                let bankAccountRef: BankAccount | undefined = undefined;
                 if (n.accountExternalId) {
                     // accountRepo is a generic repository; use findOne by externalAccountId
-                    const ba = await (accountRepo as any).findOne({ where: { externalAccountId: n.accountExternalId } });
+                    const ba = await accountRepo.findOne({ where: { externalAccountId: n.accountExternalId } });
                     if (ba) bankAccountRef = ba;
                 }
 
-                const txData: any = {
+                const txData: Partial<Transaction> = {
                     externalId: n.externalId,
                     amount: n.amount,
                     description: n.description,
@@ -58,7 +59,7 @@ export class SyncService {
                     txData.bankAccount = bankAccountRef;
                 }
 
-                const tx = txRepo.create(txData as any);
+                const tx = txRepo.create(txData);
                 await txRepo.save(tx);
             }
         } catch (err) {
@@ -72,11 +73,5 @@ export class SyncService {
         for (const c of conns) {
             await this.runOnceForConnection(c);
         }
-    }
-
-    start(intervalMs = 1000 * 60 * 60 * 24) {
-        // intervalMs default: 24h
-        this.syncAll().catch(err => console.error(err));
-        setInterval(() => this.syncAll().catch(err => console.error(err)), intervalMs);
     }
 }

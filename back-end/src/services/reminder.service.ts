@@ -1,4 +1,4 @@
-import { getRepository, MoreThan } from 'typeorm';
+import { getRepository, Between } from 'typeorm';
 import { Task } from '../models/Task';
 import { NotificationService } from './notification.service';
 import { User } from '../models/User';
@@ -17,26 +17,22 @@ export class ReminderService {
     async checkAndSendReminders() {
         const repo = getRepository(Task);
         const now = new Date();
-        // tarefas com dueDate nas próximas 24 horas e não concluídas
-        const tasks = await repo.find({ where: { completed: false, dueDate: MoreThan(now) }, relations: ['assignedTo', 'couple'] });
+        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+
+        // Busca tarefas não concluídas que vencem EXATAMENTE na próxima hora.
+        const tasks = await repo.find({ 
+            where: { 
+                completed: false, 
+                dueDate: Between(now, oneHourFromNow) 
+            }, 
+            relations: ['assignedTo', 'couple'] 
+        });
 
         for (const t of tasks) {
-            if (!t.dueDate) continue;
-            const timeDiff = t.dueDate.getTime() - now.getTime();
-            // se dentro de 24h
-            if (timeDiff > 0 && timeDiff <= 1000 * 60 * 60 * 24) {
-                // enviar lembrete para assignedTo (se existir) e para ambos membros do casal
-                if (t.assignedTo) {
-                    const user: User = t.assignedTo as any;
-                    await this.notification.sendUserNotification(user, `Lembrete: ${t.title}`, `Tarefa "${t.title}" vence em ${t.dueDate.toISOString()}`);
-                }
+            if (t.assignedTo) {
+                // O 'as any' não é necessário se a relação 'assignedTo' estiver corretamente tipada como User.
+                await this.notification.sendUserNotification(t.assignedTo, `Lembrete: ${t.title}`, `Sua tarefa "${t.title}" vence na próxima hora!`);
             }
         }
-    }
-
-    start(intervalMs = 1000 * 60 * 60) {
-        // checa a cada hora
-        this.checkAndSendReminders().catch(console.error);
-        setInterval(() => this.checkAndSendReminders().catch(console.error), intervalMs);
     }
 }

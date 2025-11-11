@@ -91,23 +91,46 @@ describe('Finance Routes', () => {
             expect(response.body.title).toBe('Test Goal');
         });
 
-        it('should update goal progress', async () => {
+        it('should add progress to a goal', async () => {
             const goal = await getRepository(Goal).save({
                 title: 'Update Goal',
                 targetAmount: 10000,
-                currentAmount: 0,
+                currentAmount: 100, // Começa com um valor inicial
                 couple
             });
 
             const response = await testApp
-                .patch(`/api/finance/goals/${goal.id}/progress`)
+                .patch(`/api/finance/goals/${goal.id}`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    currentAmount: 5000
+                    amount: 500 // Adiciona 500 ao progresso
                 });
 
             expect(response.status).toBe(200);
-            expect(response.body.currentAmount).toBe(5000);
+            // O valor final deve ser o inicial (100) + o adicionado (500)
+            expect(response.body.currentAmount).toBe(600);
+        });
+
+        it('should return 403 when trying to update a goal from another couple', async () => {
+            // Cria um segundo casal e uma meta para ele
+            const otherUser = await getRepository(User).save({ email: 'other@test.com', password: '123' });
+            const otherCouple = await getRepository(Couple).save({ user1: otherUser });
+            const otherGoal = await getRepository(Goal).save({
+                title: 'Other Couple Goal',
+                targetAmount: 5000,
+                currentAmount: 0,
+                couple: otherCouple,
+            });
+
+            // Tenta atualizar a meta do outro casal com o token do primeiro usuário
+            const response = await testApp
+                .patch(`/api/finance/goals/${otherGoal.id}`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({ amount: 100 });
+
+            // Espera um erro de "Forbidden"
+            expect(response.status).toBe(403);
+            expect(response.body.message).toBe('Você não tem permissão para atualizar esta meta.');
         });
     });
 
